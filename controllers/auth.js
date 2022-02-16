@@ -1,7 +1,8 @@
 const User = require("../models/user");
 const { hashPassword, comparePassword } = require("../utils/auth");
+const jwt = require("jsonwebtoken");
 
- const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     //first make sure that we are receiving data from front-end
     //console.log(req.body);
@@ -38,4 +39,33 @@ const { hashPassword, comparePassword } = require("../utils/auth");
   }
 };
 
-module.exports = register
+const login = async (req, res) => {
+  try {
+    // console.log(req.body);
+    const { email, password } = req.body;
+    //check if our db has user with that email
+    const user = await User.findOne({ email }).exec();
+    if (!user) return res.ststuss(400).send("No user found");
+    //check password
+    const match = await comparePassword(password, user.password);
+    // create signed jwt
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+    //returnuser and token to client, exclide hashed password
+    user.password = undefined;
+    // send token in cookie with http only flag(so its not accesible using js)
+    res.cookie("token", token, {
+      httpOnly: true,
+      // secure:true, //only works on https
+    });
+    // send user as json reaponse
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    return res.ststus(400).send("Error. Try Again");
+  }
+};
+
+module.exports = register;
+module.exports = login;

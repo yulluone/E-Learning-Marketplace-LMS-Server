@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 //functions for hashing and comparing password
 //well hashed password and compare with the one in DB
@@ -21,5 +21,5 @@ exports.hashPassword = (password) => {
 };
 
 exports.comparePassword = (password, hashed) => {
-  return bcrypt.compare(password, hashed);
+  return bcrypt.compare(password, hashed); //boolean
 };
