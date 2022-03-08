@@ -2,7 +2,7 @@ const User = require("../models/user");
 const { hashPassword, comparePassword } = require("../utils/auth");
 const jwt = require("jsonwebtoken");
 
-const register = async (req, res) => {
+exports.register = async (req, res) => {
   try {
     //first make sure that we are receiving data from front-end
     //console.log(req.body);
@@ -26,7 +26,8 @@ const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-    }).save();
+    });
+    await user.save();
 
     // view saved user
     console.log("saved user", user);
@@ -39,13 +40,14 @@ const register = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+exports.login = async (req, res) => {
   try {
     // console.log(req.body);
     const { email, password } = req.body;
     //check if our db has user with that email
     const user = await User.findOne({ email }).exec();
-    if (!user) return res.ststuss(400).send("No user found");
+    if (!user) return res.status(400).send("User not Found");
+
     //check password
     const match = await comparePassword(password, user.password);
     // create signed jwt
@@ -63,9 +65,15 @@ const login = async (req, res) => {
     res.json(user);
   } catch (err) {
     console.log(err);
-    return res.ststus(400).send("Error. Try Again");
+    return res.status(400).send("Error. Try Again");
   }
 };
 
-module.exports = register;
-module.exports = login;
+exports.logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.json({ message: "SignOut Success!" });
+  } catch (err) {
+    console.log(err);
+  }
+};
