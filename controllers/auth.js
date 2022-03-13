@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       // secure:true, //only works on https
     });
-    // send user as json reaponse
+    // send user as json response
     res.json(user);
   } catch (err) {
     console.log(err);
@@ -73,6 +73,16 @@ exports.logout = async (req, res) => {
   try {
     res.clearCookie("token");
     return res.json({ message: "SignOut Success!" });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.currentUser = async (req, res) => {
+  try {
+    const user = await User.finfByid(req.user._id).select("-password").exec();
+    console.log("CURRENT USER", user);
+    return res.json(user);
   } catch (err) {
     console.log(err);
   }

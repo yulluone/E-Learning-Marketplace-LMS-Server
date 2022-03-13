@@ -2,8 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
+
+const csrfProtection = csrf({ cookie: true });
 
 //create express app
 const app = express();
@@ -24,6 +28,16 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(require("./routes/ROUTE_MOUNTER"));
+app.use(cookieParser());
+//csrf
+app.use(csrfProtection);
+
+//endpoit
+app.get("/auth/csrf-token", (req, res) => {
+  res.json({
+    csrfToken: req.csrfToken(),
+  });
+});
 
 //port
 const port = process.env.PORT || 8000;
