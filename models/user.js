@@ -1,15 +1,16 @@
-const mongoose = require('mongoose');
-
-const { Schema } = mongoose;
+const mongoose = require("mongoose");
+const passportLocalMongoose = require("passport-local-mongoose");
+const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
-    name: {
+    username: {
       type: String,
       //removes white spaces at the begining and end incase user clicks by mistake
       trim: true,
       //a user will not be created if field is not provided
       required: true,
+      unique: true,
     },
 
     email: {
@@ -18,13 +19,6 @@ const userSchema = new Schema(
       required: true,
       //no two users can have the same email
       unique: true,
-    },
-    password: {
-      //password will be hashed with becrypt
-      type: String,
-      required: true,
-      min: 6,
-      max: 64,
     },
     picture: {
       type: String,
@@ -45,5 +39,8 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+// plugin for passport-local-mongoose
+userSchema.plugin(passportLocalMongoose);
+
 //export as a model
-module.exports =  mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);

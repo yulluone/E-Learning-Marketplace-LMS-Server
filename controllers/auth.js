@@ -1,38 +1,33 @@
-const User = require("../models/user");
-const { hashPassword, comparePassword } = require("../utils/auth");
-const jwt = require("jsonwebtoken");
+const express = require("express"),
+  User = require("../models/user"),
+  passportLocalMongoose = require("passport-local-mongoose"),
+  { hashPassword, comparePassword } = require("../utils/auth");
 
 exports.register = async (req, res) => {
   try {
-    //first make sure that we are receiving data from front-end
-    //console.log(req.body);
-    //destructure values so its easy to use
+    // console.log(req.body);
     const { name, email, password } = req.body;
-    //validation
+    // validation
     if (!name) return res.status(400).send("Name is required");
     if (!password || password.length < 6) {
       return res
         .status(400)
-        .send("Password is required and should be minimum 6 characters long");
+        .send("Password is required and should be min 6 characters long");
     }
     let userExist = await User.findOne({ email }).exec();
-    if (userExist) return res.status(400).send("Email is already taken");
+    if (userExist) return res.status(400).send("Email is taken");
 
     // hash password
     const hashedPassword = await hashPassword(password);
 
-    // register user
+    // register
     const user = new User({
       name,
       email,
       password: hashedPassword,
     });
     await user.save();
-
-    // view saved user
-    console.log("saved user", user);
-
-    //send response
+    // console.log("saved user", user);
     return res.json({ ok: true });
   } catch (err) {
     console.log(err);

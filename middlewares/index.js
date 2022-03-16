@@ -2,7 +2,8 @@ const expressJwt = require("express-jwt");
 const jwt = require("jsonwebtoken");
 
 
-const requireSignIn = (async = jwt({
+
+const requireSignIn = (async = expressJwt({
   getToken: (req, res) => {
     // console.log(req);
     req.token;
