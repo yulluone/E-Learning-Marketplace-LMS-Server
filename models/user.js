@@ -20,6 +20,9 @@ const userSchema = new Schema(
       //no two users can have the same email
       unique: true,
     },
+    password: {
+      
+    },
     picture: {
       type: String,
       default: "/avatar.png",

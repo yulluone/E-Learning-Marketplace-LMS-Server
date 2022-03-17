@@ -1,6 +1,5 @@
 // importing User Schema
 const User = require("../models/user");
-const express = require("express");
 const passport = require("passport");
 
 exports.register = async (req, res) => {
@@ -24,37 +23,39 @@ exports.register = async (req, res) => {
             return res.status(400).send("Your account could not be saved.");
         }
       } else {
-        console.log(user);
-        res.status(202).send("Registration Succesful");
-        const authenticate = User.authenticate();
-        authenticate("username", "password", (err, result) => {
-          if (err) {
-            console.log(err);
-            res.status(400).send("could not validate.");
-          } else {
-            console.log("Authentication Successful");
-          }
-        });
+        // console.log(user);
+        res.send("Registration Succesful");
+        // try {
+        //   const authenticate = User.authenticate();
+        //   authenticate("username", "password", (err, result) => {
+        //     if (err) {
+        //       console.log(err);
+        //       res.status(400).send("could not validate.");
+        //     } else {
+        //       console.log("Authentication Successful");
+        //     }
+        //   });
+        // } catch (err) {
+        //   console.log(err);
+        // }
       }
     }
   );
 };
 
-exports.login = (req, res) => {
+exports.login = async = (req, res) => {
+  
   try {
-    passport.authenticate(
-      { usernameField: req.body.username, paswordField: req.body.password },
-      (err, user) => {
-        if (err) {
-          console.log(err);
-          res.status(400).send("error");
-        } else {
-          console.log("Authentication success");
-          res.status(202).send("Authentication success");
-          res.json(user);
-        }
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        console.log(info);
+        res.status(401).send("Error");
       }
-    );
+
+      if (user) {
+        return res.json(user).status(202).send("Authentication success");
+      }
+    });
   } catch (err) {
     console.log(err);
   }

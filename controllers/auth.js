@@ -2,6 +2,7 @@ const express = require("express"),
   User = require("../models/user"),
   passportLocalMongoose = require("passport-local-mongoose"),
   { hashPassword, comparePassword } = require("../utils/auth");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
@@ -19,9 +20,11 @@ exports.register = async (req, res) => {
 
     // hash password
     const hashedPassword = await hashPassword(password);
+    console.log(hashedPassword);
 
     // register
     const user = new User({
+      username: email,
       name,
       email,
       password: hashedPassword,
