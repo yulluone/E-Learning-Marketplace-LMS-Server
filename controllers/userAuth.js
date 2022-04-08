@@ -27,14 +27,19 @@ exports.register = async (req, res) => {
         res.send("Registration Succesful");
         // try {
         //   const authenticate = User.authenticate();
-        //   authenticate("username", "password", (err, result) => {
-        //     if (err) {
-        //       console.log(err);
-        //       res.status(400).send("could not validate.");
-        //     } else {
-        //       console.log("Authentication Successful");
+        //  authenticate(
+        //     { username: req.body.username },
+        //     { password: req.body.password },
+        //     (err, result) => {
+        //       if (err) {
+        //         console.log(err);
+        //         res.status(400).send("could not validate.");
+        //       }
+        //       if (user) {
+        //         console.log("Authentication Successful");
+        //       }
         //     }
-        //   });
+        //   );
         // } catch (err) {
         //   console.log(err);
         // }
@@ -43,20 +48,22 @@ exports.register = async (req, res) => {
   );
 };
 
-exports.login = async = (req, res) => {
-  
-  try {
-    passport.authenticate("local", (err, user, info) => {
+exports.login = async (req, res, next) => {
+  await passport.authenticate(
+    { username: req.body.username },
+    { password: req.body.password },
+    function (user, info, err) {
       if (err) {
+        console.log(err);
         console.log(info);
-        res.status(401).send("Error");
+        res.json(err);
+        next();
       }
-
       if (user) {
-        return res.json(user).status(202).send("Authentication success");
+        console.log("login success");
+        res.json(user);
+        next();
       }
-    });
-  } catch (err) {
-    console.log(err);
-  }
+    }
+  );
 };

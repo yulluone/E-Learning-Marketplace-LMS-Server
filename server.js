@@ -1,22 +1,21 @@
 const express = require("express");
+//create express app
+const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-// const csrf = require("csurf");
-const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const User = require("./models/user");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser")
+let User = require("./models/user");
 
-// require("./middlewares/authenticate");
+
 
 require("dotenv").config();
 
-// const csrfProtection = csrf({ cookie: true });
 
-//create express app
-const app = express();
+
 
 //mongoose
 mongoose
@@ -30,15 +29,23 @@ mongoose
   .catch((err) => console.log("DB CONNECTION ERR => ", err));
 
 //apply middlewares
-app.use(cors());
 app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:3000"
+}));
+
+app.use(bodyParser.json());
+app.use(cookieParser())
 app.use(morgan("dev"));
 app.use(require("./routes/ROUTE_MOUNTER"));
 
-app.use(cookieParser());
-
+//passport
 app.use(passport.initialize());
+app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //port
 const port = process.env.PORT || 8000;
