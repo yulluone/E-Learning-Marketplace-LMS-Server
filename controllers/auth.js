@@ -54,7 +54,6 @@ exports.login = async (req, res) => {
           payloadObj,
           process.env.JWT_SECRET,
           { expiresIn: "7d" },
-          { algorithm: "RS256" }
         );
         user.hash = undefined;
         user.salt = undefined;

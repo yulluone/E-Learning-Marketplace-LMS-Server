@@ -17,7 +17,7 @@ authRouter.get(
   "/current-user",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    console.log(req);
+    console.log(jwt_payload);
     res.status(200).json({
       success: true,
       msg: "You are successfully authenticated to this route!",

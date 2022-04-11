@@ -43,26 +43,30 @@ app.use(require("./routes/ROUTE_MOUNTER"));
 //passport
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy(User.authenticate({ session: false })));
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET,
+
   algorithms: ["RS256"],
+  jwtTokenOptions: {
+    expiresIn: "7d",
+  },
 };
 
 passport.use(
   new JwtStrategy(options, async (jwt_payload, done) => {
-      User.findOne({ id: jwt_payload.userId }, function (err, user) {
-        if (err) {
-          return done(err, false);
-        }
-        if (user) {
-          return done(null, user);
-        } else {
-          return done(null, false);
-        }
-      });
+    User.findOne({ id: jwt_payload.userId }, function (err, user) {
+      if (err) {
+        return done(err, false);
+      }
+      if (user) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
+    });
   })
 );
 
