@@ -1,70 +1,68 @@
-const express = require("express"),
-  User = require("../models/user"),
-  passportLocalMongoose = require("passport-local-mongoose"),
-  { hashPassword, comparePassword } = require("../utils/auth");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const passport = require("passport");
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 exports.register = async (req, res) => {
-  try {
-    // console.log(req.body);
-    const { name, email, password } = req.body;
-    // validation
-    if (!name) return res.status(400).send("Name is required");
-    if (!password || password.length < 6) {
-      return res
-        .status(400)
-        .send("Password is required and should be min 6 characters long");
+  User.register(
+    { username: req.body.username, email: req.body.email },
+    req.body.password,
+    (err, user) => {
+      if (err) {
+        console.log(err.name);
+        switch (err.name) {
+          case "MissingPasswordError":
+            return res.status(400).send("Password required");
+            break;
+          case "MissingUsernameError":
+            return res.status(400).send("Email Required");
+            break;
+          case "UserExistsError":
+            return res.status(400).send("Email already taken");
+            break;
+          default:
+            return res.status(400).send("Your account could not be saved.");
+        }
+      } else {
+        // console.log(user);
+        res.send("Registration Succesful");
+      }
     }
-    let userExist = await User.findOne({ email }).exec();
-    if (userExist) return res.status(400).send("Email is taken");
-
-    // hash password
-    const hashedPassword = await hashPassword(password);
-    console.log(hashedPassword);
-
-    // register
-    const user = new User({
-      username: email,
-      name,
-      email,
-      password: hashedPassword,
-    });
-    await user.save();
-    // console.log("saved user", user);
-    return res.json({ ok: true });
-  } catch (err) {
-    console.log(err);
-    return res.status(400).send("Error. Try again.");
-  }
+  );
 };
 
 exports.login = async (req, res) => {
-  try {
-    // console.log(req.body);
-    const { email, password } = req.body;
-    //check if our db has user with that email
-    const user = await User.findOne({ email }).exec();
-    if (!user) return res.status(400).send("User not Found");
+  await passport.authenticate(
+    "local",
+    { session: false },
+    function (err, user, info) {
+      if (err) {
+        console.log(err, info);
+        return res.status(500).send("server error");
+      }
+      if (!user) {
+        console.log("Username or Password incorrect");
+        return res.status(401).send("Username or Password Incorrect");
+      } else {
+        const payloadObj = {
+          userId: user._id,
+          username: user.username,
+        };
 
-    //check password
-    const match = await comparePassword(password, user.password);
-    // create signed jwt
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    //returnuser and token to client, exclide hashed password
-    user.password = undefined;
-    // send token in cookie with http only flag(so its not accesible using js)
-    res.cookie("token", token, {
-      httpOnly: true,
-      // secure:true, //only works on https
-    });
-    // send user as json response
-    res.json(user);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).send("Error. Try Again");
-  }
+        const token = jwt.sign(
+          payloadObj,
+          process.env.JWT_SECRET,
+          { expiresIn: "7d" },
+          { algorithm: "RS256" }
+        );
+        user.hash = undefined;
+        user.salt = undefined;
+        res.json({ user, token, message: "Auth Success" });
+        // res.send("Auth Succcess");
+      }
+    }
+  )(req, res);
 };
 
 exports.logout = async (req, res) => {
@@ -76,12 +74,20 @@ exports.logout = async (req, res) => {
   }
 };
 
-exports.currentUser = async (req, res) => {
-  try {
-    const user = await User.finfByid(req.user._id).select("-password").exec();
-    console.log("CURRENT USER", user);
-    return res.json(user);
-  } catch (err) {
-    console.log(err);
-  }
-};
+// exports.currentUser = async (req, res) => {
+//   const options = {
+//     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//     secretOrKey: process.env.JWT_SECRET,
+//     algorithms: ["RS256"],
+//   };
+
+//   try {
+//     await passport.authenticate("jwt", options, (req, res, next) => {
+//       console.log(res)
+//       res.send("sucess")
+//       next()
+//     } )(req, res)
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
