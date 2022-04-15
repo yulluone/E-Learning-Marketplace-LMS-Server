@@ -1,8 +1,6 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
 
 exports.register = async (req, res) => {
   User.register(
@@ -36,7 +34,7 @@ exports.login = async (req, res) => {
   await passport.authenticate(
     "local",
     { session: false },
-    function (err, user, info) {
+    (err, user, info) => {
       if (err) {
         console.log(err, info);
         return res.status(500).send("server error");
@@ -50,11 +48,9 @@ exports.login = async (req, res) => {
           username: user.username,
         };
 
-        const token = jwt.sign(
-          payloadObj,
-          process.env.JWT_SECRET,
-          { expiresIn: "7d" },
-        );
+        const token = jwt.sign(payloadObj, process.env.JWT_SECRET, {
+          expiresIn: "7d",
+        });
         user.hash = undefined;
         user.salt = undefined;
         res.json({ user, token, message: "Auth Success" });
@@ -73,20 +69,36 @@ exports.logout = async (req, res) => {
   }
 };
 
-// exports.currentUser = async (req, res) => {
-//   const options = {
-//     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//     secretOrKey: process.env.JWT_SECRET,
-//     algorithms: ["RS256"],
-//   };
+exports.currentUser = async (req, res) => {
+  console.log(req.cookies);
+  // const token = req.headers.token;
+  // const jwtPayload = jwt.verify(
+  //   token,
+  //   process.env.JWT_SECRET,
+  //   (err, jwtPayload) => {
+  //     if (err) {
+  //       console.log(err);
+  //       res.status(401).jason(err);
+  //     }
+  //     if (jwtPayload) {
+  //       return jwtPayload;
+  //     }
+  //   }
+  // );
 
-//   try {
-//     await passport.authenticate("jwt", options, (req, res, next) => {
-//       console.log(res)
-//       res.send("sucess")
-//       next()
-//     } )(req, res)
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+  // if (jwtPayload) {
+  //   console.log(jwtPayload);
+  //   User.findOne({ username: jwtPayload.username }, (err, user) => {
+  //     if (err) {
+  //       console.log(err);
+  //       res.status(401).json(err);
+  //     }
+  //     if (!user) {
+  //       res.status(401).send("error.");
+  //     } else {
+  //       console.log("Succesfully authenticated to this route");
+  //       res.status(200).json(user);
+  //     }
+  //   });
+  // }
+};

@@ -9,12 +9,10 @@ const LocalStrategy = require("passport-local").Strategy;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 let User = require("./models/user");
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-const JwtStrategy = require("passport-jwt").Strategy;
 
 require("dotenv").config();
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
 //mongoose
 mongoose
@@ -44,31 +42,6 @@ app.use(require("./routes/ROUTE_MOUNTER"));
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate({ session: false })));
-
-const options = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-
-  algorithms: ["RS256"],
-  jwtTokenOptions: {
-    expiresIn: "7d",
-  },
-};
-
-passport.use(
-  new JwtStrategy(options, async (jwt_payload, done) => {
-    User.findOne({ id: jwt_payload.userId }, function (err, user) {
-      if (err) {
-        return done(err, false);
-      }
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    });
-  })
-);
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
