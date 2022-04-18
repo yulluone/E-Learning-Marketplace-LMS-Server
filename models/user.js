@@ -4,6 +4,14 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      //removes white spaces at the begining and end incase user clicks by mistake
+      trim: true,
+      //a user will not be created if field is not provided
+      required: true,
+    },
+
     username: {
       type: String,
       //removes white spaces at the begining and end incase user clicks by mistake

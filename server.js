@@ -12,8 +12,6 @@ let User = require("./models/user");
 
 require("dotenv").config();
 
-app.use(cookieParser());
-
 //mongoose
 mongoose
   .connect(process.env.DATABASE, {
@@ -33,6 +31,8 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
+
+app.use(cookieParser());
 
 // app.use(bodyParser.json());
 app.use(morgan("dev"));

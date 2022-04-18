@@ -1,5 +1,5 @@
 const express = require("express");
-const requireSignIn = require("../middlewares");
+const {requireSignIn} = require("../middlewares");
 const authRouter = express.Router();
 // controllers
 const AuthController = require("../controllers/auth");
@@ -11,7 +11,7 @@ authRouter.post("/register", AuthController.register);
 authRouter.get("/logout", AuthController.logout);
 
 authRouter.get(
-  "/current-user", AuthController.currentUser
+  "/current-user", requireSignIn, AuthController.currentUser
 );
 
 module.exports = authRouter;

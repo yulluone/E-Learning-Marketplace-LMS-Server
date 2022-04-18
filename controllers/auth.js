@@ -4,7 +4,7 @@ const passport = require("passport");
 
 exports.register = async (req, res) => {
   User.register(
-    { username: req.body.username, email: req.body.email },
+    { name: req.body.name, username: req.body.username, email: req.body.email },
     req.body.password,
     (err, user) => {
       if (err) {
@@ -37,11 +37,11 @@ exports.login = async (req, res) => {
     (err, user, info) => {
       if (err) {
         console.log(err, info);
-        return res.status(500).send("server error");
+        res.status(500).json({ ok: false, message: "Server error." });
       }
       if (!user) {
         console.log("Username or Password incorrect");
-        return res.status(401).send("Username or Password Incorrect");
+        res.json({ ok: false, message: "Username or Password incorrect" });
       } else {
         const payloadObj = {
           userId: user._id,
@@ -51,10 +51,10 @@ exports.login = async (req, res) => {
         const token = jwt.sign(payloadObj, process.env.JWT_SECRET, {
           expiresIn: "7d",
         });
+
         user.hash = undefined;
         user.salt = undefined;
-        res.json({ user, token, message: "Auth Success" });
-        // res.send("Auth Succcess");
+        res.json({ ok: true, user, token, message: "Auth Success" });
       }
     }
   )(req, res);
@@ -70,35 +70,12 @@ exports.logout = async (req, res) => {
 };
 
 exports.currentUser = async (req, res) => {
-  console.log(req.cookies);
-  // const token = req.headers.token;
-  // const jwtPayload = jwt.verify(
-  //   token,
-  //   process.env.JWT_SECRET,
-  //   (err, jwtPayload) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.status(401).jason(err);
-  //     }
-  //     if (jwtPayload) {
-  //       return jwtPayload;
-  //     }
-  //   }
-  // );
-
-  // if (jwtPayload) {
-  //   console.log(jwtPayload);
-  //   User.findOne({ username: jwtPayload.username }, (err, user) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.status(401).json(err);
-  //     }
-  //     if (!user) {
-  //       res.status(401).send("error.");
-  //     } else {
-  //       console.log("Succesfully authenticated to this route");
-  //       res.status(200).json(user);
-  //     }
-  //   });
-  // }
+  try {
+    const user = await User.findById(req.user.userId)
+      .select("-password")
+      .exec();
+    return res.json({user, ok: true});
+  } catch (err) {
+    console.log(err);
+  }
 };
