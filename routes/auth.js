@@ -14,4 +14,8 @@ authRouter.get(
   "/current-user", requireSignIn, AuthController.currentUser
 );
 
+authRouter.post("/forgot-password", AuthController.forgotPassword)
+
+authRouter.post("/password-reset", AuthController.passwordReset)
+
 module.exports = authRouter;

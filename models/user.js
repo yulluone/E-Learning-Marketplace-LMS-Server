@@ -44,7 +44,13 @@ const userSchema = new Schema(
     stripe_account_id: "",
     stripe_sellers: {}, //w
     stripeSession: {},
+
+    shortCode: {
+      type: String,
+
+    },
   },
+
   { timestamps: true }
 );
 
