@@ -11,6 +11,7 @@
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
+    "braintree": "^3.11.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
@@ -24,7 +25,6 @@
     "morgan": "^1.10.0",
     "nanoid": "^3.3.3",
     "nodemailer": "^6.7.3",
-    "nodemailer-sendgrid-transport": "^0.2.0",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^7.0.0"
