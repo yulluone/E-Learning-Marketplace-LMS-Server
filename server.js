@@ -40,7 +40,7 @@ app.use(require("./routes/ROUTE_MOUNTER"));
 
 //passport
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate({ session: false })));
 
 passport.serializeUser(User.serializeUser());

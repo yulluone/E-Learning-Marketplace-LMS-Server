@@ -171,25 +171,4 @@ exports.passwordReset = async = (req, res) => {
   const code = req.body.code;
 };
 
-exports.becomeInstructor = async (req, res) => {
-  try {
-    await Wallet.create({
-      _id: req.user.userId,
-      mpesaNumber: req.body.mpesaNumber,
-      mpesaName: req.body.mpesaName,
-    });
-    await User.findOneAndUpdate(
-      { _id: req.user.userId },
-      {
-        role: ["Instructor"],
-      }
-    );
-    res.status(200).json({
-      message:
-        "Payment details updated successfully. You can now create courses.",
-    });
-    console.log(req.user);
-  } catch (err) {
-    console.log(err);
-  }
-};
+
