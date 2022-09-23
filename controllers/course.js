@@ -20,7 +20,7 @@ exports.uploadImage = (req, res) => {
     } else {
       var params = {
         Body: base64Data,
-        Bucket: "edemy-courses",
+        Bucket: "edemy-public",
         Key: `${nanoid()}.${type}`,
         ContentEncoding: "base64",
         ContentType: `image/${type}`,
@@ -38,6 +38,7 @@ exports.uploadImage = (req, res) => {
               } else {
                 var resData = {
                   Bucket: params.Bucket,
+                  // ETag: data.ETag,
                   Key: params.Key,
                   cid: data.Metadata.cid,
                 };
@@ -49,4 +50,27 @@ exports.uploadImage = (req, res) => {
       });
     }
   });
+};
+
+exports.removeImage = (req, res) => {
+  if (!req.body.image) {
+    console.log(req.body);
+    return res.sendStatus(400);
+  } else {
+    console.log(req.body);
+    const { image } = req.body;
+    var params = {
+      Bucket: image.Bucket,
+      Key: image.Key,
+    };
+    S3.deleteObject(params, (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.sendStatus(500);
+      } else {
+        console.log(data);
+        return res.send(data);
+      }
+    });
+  }
 };

@@ -10,7 +10,10 @@ const { requireSignIn } = require("../middlewares");
 
 //controllers
 const InstructorController = require("../controllers/instructor");
+const { uploadImage } = require("../controllers/course");
+const { removeImage } = require("../controllers/course");
 
+//routes
 router.post(
   "/make-instructor",
   requireSignIn,
@@ -23,9 +26,8 @@ router.get(
   InstructorController.currentInstructor
 );
 
-//controllers
-const {uploadImage} = require("../controllers/course");
-
 router.post("/course/upload-image", uploadImage);
+
+router.post("/course/remove-image", removeImage);
 
 module.exports = router;
