@@ -23,4 +23,9 @@ router.get(
   InstructorController.currentInstructor
 );
 
+//controllers
+const {uploadImage} = require("../controllers/course");
+
+router.post("/course/upload-image", uploadImage);
+
 module.exports = router;

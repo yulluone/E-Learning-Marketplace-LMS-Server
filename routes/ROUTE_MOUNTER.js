@@ -4,4 +4,4 @@ const express = require("express");
 
 module.exports = app = express();
 app.use("/auth", authRouter);
-app.use("/user", router);
+app.use("/instructor", router);

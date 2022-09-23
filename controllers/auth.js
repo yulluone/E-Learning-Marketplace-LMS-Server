@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const { nanoid } = require("nanoid");
 const Wallet = require("../models/wallet");
 
+
 exports.register = async (req, res) => {
   User.register(
     { name: req.body.name, username: req.body.username, email: req.body.email },

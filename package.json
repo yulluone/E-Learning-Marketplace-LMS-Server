@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.171.0",
+    "aws-sdk": "^2.1221.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
     "braintree": "^3.11.0",
