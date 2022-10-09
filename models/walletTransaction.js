@@ -9,7 +9,7 @@ const walletTransactionSchema = new Schema(
     // double save it for security
     userId: {
       type: String,
-      ref: "users",
+      ref: "User",
       required: true,
     },
 

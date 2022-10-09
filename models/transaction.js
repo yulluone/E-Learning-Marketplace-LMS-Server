@@ -5,7 +5,7 @@ const transactionSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
     transactionId: {
       type: Number,

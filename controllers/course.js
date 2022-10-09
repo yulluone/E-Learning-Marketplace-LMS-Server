@@ -1,5 +1,7 @@
 const AWS = require("aws-sdk");
 const { nanoid } = require("nanoid");
+const Course = require("../models/course");
+const slugify = require("slugify");
 
 const S3 = new AWS.S3({
   endpoint: "https://s3.filebase.com",
@@ -72,5 +74,26 @@ exports.removeImage = (req, res) => {
         return res.send(data);
       }
     });
+  }
+};
+
+exports.create = async (req, res) => {
+  console.log("crete course", req.body);
+  const alreadyExist = await Course.findOne({
+    slug: slugify(req.body.name.toLowerCase()),
+  });
+
+  if (alreadyExist) return res.status(400).send("Title is taken");
+
+  const course = await new Course({
+    slug: slugify(req.body.name),
+    instructor: req.user.userId,
+    ...req.body,
+  }).save();
+  res.json(course);
+  try {
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send("Course create failed. Try Again");
   }
 };
