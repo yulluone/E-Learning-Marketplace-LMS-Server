@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Wallet = require("../models/wallet");
+const Course = require("../models/course");
 
 exports.makeInstructor = async (req, res) => {
   try {
@@ -43,6 +44,18 @@ exports.currentInstructor = async (req, res) => {
     } else {
       res.json({ ok: true });
     }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.instructorCourses = async (req, res) => {
+  try {
+    const courses = await Course.find({ instructor: req.user.userId })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    res.json(courses);
   } catch (err) {
     console.log(err);
   }
