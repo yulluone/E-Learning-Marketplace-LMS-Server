@@ -14,7 +14,7 @@ const {
   makeInstructor,
   instructorCourses,
 } = require("../controllers/instructor");
-const { uploadImage, removeImage, create } = require("../controllers/course");
+const { uploadImage, removeImage, create, readCourse } = require("../controllers/course");
 
 //routes
 router.post("/make-instructor", requireSignIn, makeInstructor);
@@ -29,5 +29,7 @@ router.post("/course", requireSignIn, isInstructor, create);
 
 //instructor dashbord courses
 router.get("/instructor-courses", requireSignIn, instructorCourses);
+
+router.get("/course/:slug", readCourse)
 
 module.exports = router;

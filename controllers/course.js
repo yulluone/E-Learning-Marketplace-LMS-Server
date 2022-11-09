@@ -98,4 +98,14 @@ exports.create = async (req, res) => {
   }
 };
 
-
+exports.readCourse = async (req, res) => {
+  try {
+    // res.send("read course end point reached");
+    const course = await Course.findOne({ slug: req.params.slug })
+      .populate("instructor", "_id name")
+      .exec();
+    res.json(course);
+  } catch (err) {
+    console.log(err);
+  }
+};
