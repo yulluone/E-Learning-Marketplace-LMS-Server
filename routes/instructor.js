@@ -21,6 +21,7 @@ const {
   create,
   readCourse,
   videoUpload,
+  removeVideo,
 } = require("../controllers/course");
 
 //routes
@@ -41,5 +42,8 @@ router.get("/course/:slug", readCourse);
 
 //lesson video	upload
 router.post("/course/video-upload", requireSignIn, formidable(), videoUpload);
+
+//remove video
+router.post("/course/video-remove", requireSignIn, removeVideo);
 
 module.exports = router;

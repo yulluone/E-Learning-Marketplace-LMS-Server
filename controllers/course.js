@@ -146,11 +146,29 @@ exports.videoUpload = async (req, res) => {
           console.log("failed to	upload");
           console.log(err);
         })
-        .on("finish", (res) => {
-          edemyBucket.makePublic();
+        .on("finish", () => {
           console.log(`uploaded to ${edemyBucket}, "as", ${key}`);
+          res.json({
+            Location: `https://storage.googleapis.com/edemy-bucet/${key}`,
+            Key: key,
+            Bucket: "edemy-bucet",
+          });
         })
     );
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//remove video from google cloud storage
+exports.removeVideo = async (req, res) => {
+  try {
+    const video = req.body.video;
+    if (!video) res.status(400).send("No video to delete");
+    const key = video.Key;
+    const { data } = await edemyBucket.file(key).delete();
+    console.log(data);
+    res.json(data);
   } catch (err) {
     console.log(err);
   }
