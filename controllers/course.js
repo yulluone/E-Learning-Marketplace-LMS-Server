@@ -8,6 +8,8 @@ const S3 = new AWS.S3({
   signatureVersion: "v4",
 });
 
+
+
 exports.uploadImage = (req, res) => {
   const { image } = req.body;
   const type = image.split(";")[0].split("/")[1];
@@ -105,6 +107,15 @@ exports.readCourse = async (req, res) => {
       .populate("instructor", "_id name")
       .exec();
     res.json(course);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.videoUpload = (req, res) => {
+  try {
+    console.log(req.body);
+    res.json({ message: "upload video endpoint reached" });
   } catch (err) {
     console.log(err);
   }
