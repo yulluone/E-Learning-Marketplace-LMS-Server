@@ -124,6 +124,10 @@ exports.readCourse = async (req, res) => {
 
 exports.videoUpload = async (req, res) => {
   try {
+    if (req.params.instructorId !== req.user.userId) {
+      return res.status(400).send("Unauthorized");
+    }
+
     const { video } = req.files;
     const videoPath = fs.realpathSync(video.path);
 
@@ -163,6 +167,9 @@ exports.videoUpload = async (req, res) => {
 //remove video from google cloud storage
 exports.removeVideo = async (req, res) => {
   try {
+    if (req.params.instructorId !== req.user.userId) {
+      return res.status(400).send("Unauthorized");
+    }
     const video = req.body.video;
     if (!video) res.status(400).send("No video to delete");
     const key = video.Key;

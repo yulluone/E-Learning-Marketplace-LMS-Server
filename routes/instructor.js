@@ -41,9 +41,9 @@ router.get("/instructor-courses", requireSignIn, instructorCourses);
 router.get("/course/:slug", readCourse);
 
 //lesson video	upload
-router.post("/course/video-upload", requireSignIn, formidable(), videoUpload);
+router.post("/course/video-upload/:instructorId", requireSignIn, formidable(), videoUpload);
 
 //remove video
-router.post("/course/video-remove", requireSignIn, removeVideo);
+router.post("/course/video-remove/:instructorId", requireSignIn, removeVideo);
 
 module.exports = router;
