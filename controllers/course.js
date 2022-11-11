@@ -122,7 +122,7 @@ exports.readCourse = async (req, res) => {
   }
 };
 
-exports.videoUpload = async (req, res) => {
+exports.videoUpload = (req, res) => {
   try {
     if (req.params.instructorId !== req.user.userId) {
       return res.status(400).send("Unauthorized");
@@ -135,7 +135,7 @@ exports.videoUpload = async (req, res) => {
     const key = `${nanoid()}.${video.type.split("/")[1]}`;
 
     if (!video) return res.status(400), send("No Video");
-    await fs.createReadStream(videoPath).pipe(
+    fs.createReadStream(videoPath).pipe(
       edemyBucket
         .file(key)
         .createWriteStream({
@@ -176,6 +176,27 @@ exports.removeVideo = async (req, res) => {
     const { data } = await edemyBucket.file(key).delete();
     console.log(data);
     res.json(data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//add lesson
+exports.addLesson = async (req, res) => {
+  try {
+    const { courseId, instructorId } = req.params;
+    const { title, content, video } = req.body;
+    if (instructorId !== req.user.userId) {
+      return res.status(400).send("Unauthorized");
+    }
+    const updated = await Course.findByIdAndUpdate(
+      { _id: courseId },
+      { $push: { lessons: { title, video, content, slug: slugify(title) } } },
+      { new: true }
+    )
+      .populate("instructor", "id	name")
+      .exec();
+    res.json(updated);
   } catch (err) {
     console.log(err);
   }
