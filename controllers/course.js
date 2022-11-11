@@ -2,13 +2,23 @@ const AWS = require("aws-sdk");
 const { nanoid } = require("nanoid");
 const Course = require("../models/course");
 const slugify = require("slugify");
+const fs = require("fs");
+const path = require("path");
+const { Storage } = require("@google-cloud/storage");
+
+const gc = new Storage({
+  keyFilename: path.join(__dirname, "../optimal-weft-368215-e62d705e67e7.json"),
+  projectId: "optimal-weft-368215",
+});
+
+const edemyBucket = gc.bucket("edemy-bucet");
+
+// gc.getBuckets().then((bucket) => console.log(bucket));
 
 const S3 = new AWS.S3({
   endpoint: "https://s3.filebase.com",
   signatureVersion: "v4",
 });
-
-
 
 exports.uploadImage = (req, res) => {
   const { image } = req.body;
@@ -112,10 +122,35 @@ exports.readCourse = async (req, res) => {
   }
 };
 
-exports.videoUpload = (req, res) => {
+exports.videoUpload = async (req, res) => {
   try {
-    console.log(req.body);
-    res.json({ message: "upload video endpoint reached" });
+    const { video } = req.files;
+    const videoPath = fs.realpathSync(video.path);
+
+    console.log(videoPath);
+    const key = `${nanoid()}.${video.type.split("/")[1]}`;
+
+    if (!video) return res.status(400), send("No Video");
+    await fs.createReadStream(videoPath).pipe(
+      edemyBucket
+        .file(key)
+        .createWriteStream({
+          contentType: video.type,
+          resumable: true,
+          metadata: {
+            contentType: video.type,
+          },
+        })
+
+        .on("error", (err) => {
+          console.log("failed to	upload");
+          console.log(err);
+        })
+        .on("finish", (res) => {
+          edemyBucket.makePublic();
+          console.log(`uploaded to ${edemyBucket}, "as", ${key}`);
+        })
+    );
   } catch (err) {
     console.log(err);
   }

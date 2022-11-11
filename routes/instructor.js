@@ -1,4 +1,5 @@
 const express = require("express");
+const formidable = require("express-formidable");
 
 const router = express.Router();
 
@@ -39,6 +40,6 @@ router.get("/instructor-courses", requireSignIn, instructorCourses);
 router.get("/course/:slug", readCourse);
 
 //lesson video	upload
-router.post("/course/video-upload", videoUpload);
+router.post("/course/video-upload", requireSignIn, formidable(), videoUpload);
 
 module.exports = router;
