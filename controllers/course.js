@@ -92,7 +92,7 @@ exports.removeImage = (req, res) => {
 exports.create = async (req, res) => {
   console.log("crete course", req.body);
   const alreadyExist = await Course.findOne({
-    slug: slugify(req.body.name.toLowerCase()),
+    slug: slugify(req.body.name),
   });
 
   if (alreadyExist) return res.status(400).send("Title is taken");
@@ -201,3 +201,39 @@ exports.addLesson = async (req, res) => {
     console.log(err);
   }
 };
+
+exports.updateCourse = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    
+    const course = await Course.findOne({
+      slug,
+    }).exec();
+    console.log(req.body);
+
+    if (req.user.userId !== course.instructor._id.toString()) {
+      return res.status(400).send("Unauthorized");
+    }
+
+			const updated = await Course.findOneAndUpdate(
+					slug,
+      req.body,
+      { new: true }
+    ).exec();
+    console.log(updated);
+    res.json(updated);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// exports.imageChange = async (req, res) => {
+// 	try {
+
+// 		const remove = removeImage(req)
+
+// 	} catch (err) {
+// 		conosle.log(err)
+// 		res.status(400).send("Image change failed")
+// 	}
+// }

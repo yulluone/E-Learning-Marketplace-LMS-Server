@@ -23,6 +23,7 @@ const {
   videoUpload,
   removeVideo,
   addLesson,
+  updateCourse,
 } = require("../controllers/course");
 
 //routes
@@ -59,5 +60,7 @@ router.post(
   requireSignIn,
   addLesson
 );
+
+router.put("/course/edit/:slug", requireSignIn, isInstructor, updateCourse);
 
 module.exports = router;
