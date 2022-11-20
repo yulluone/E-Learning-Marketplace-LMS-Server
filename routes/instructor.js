@@ -24,6 +24,7 @@ const {
   removeVideo,
   addLesson,
   updateCourse,
+  deleteLesson,
 } = require("../controllers/course");
 
 //routes
@@ -62,5 +63,7 @@ router.post(
 );
 
 router.put("/course/edit/:slug", requireSignIn, isInstructor, updateCourse);
+
+router.put("/course/delete/:slug/:lessonId", requireSignIn, isInstructor, deleteLesson);
 
 module.exports = router;

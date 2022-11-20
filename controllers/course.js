@@ -205,7 +205,7 @@ exports.addLesson = async (req, res) => {
 exports.updateCourse = async (req, res) => {
   try {
     const { slug } = req.params;
-    
+
     const course = await Course.findOne({
       slug,
     }).exec();
@@ -215,25 +215,32 @@ exports.updateCourse = async (req, res) => {
       return res.status(400).send("Unauthorized");
     }
 
-			const updated = await Course.findOneAndUpdate(
-					slug,
-      req.body,
-      { new: true }
-    ).exec();
-    console.log(updated);
+    const updated = await Course.findOneAndUpdate(slug, req.body, {
+      new: true,
+    }).exec();
+    // console.log(updated);
     res.json(updated);
   } catch (err) {
     console.log(err);
   }
 };
 
-// exports.imageChange = async (req, res) => {
-// 	try {
+exports.deleteLesson = async (req, res) => {
+  try {
+    const { slug, lessonId } = req.params;
+    const course = await Course.findOne({ slug }).exec();
 
-// 		const remove = removeImage(req)
+    if (course.instructor._id.toString() !== req.user.userId) {
+      return res.status(400).send("Unauthorized");
+    }
 
-// 	} catch (err) {
-// 		conosle.log(err)
-// 		res.status(400).send("Image change failed")
-// 	}
-// }
+    const updated = await Course.findByIdAndUpdate(
+      course._id,
+      { $pull: { lessons: { _id: lessonId } } },
+      { new: true }
+    ).exec();
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+  }
+};
