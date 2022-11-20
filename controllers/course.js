@@ -209,16 +209,16 @@ exports.updateCourse = async (req, res) => {
     const course = await Course.findOne({
       slug,
     }).exec();
-    console.log(req.body);
+    // console.log(req.body);
 
     if (req.user.userId !== course.instructor._id.toString()) {
       return res.status(400).send("Unauthorized");
     }
 
-    const updated = await Course.findOneAndUpdate(slug, req.body, {
+    const updated = await Course.findOneAndUpdate({ slug }, req.body, {
       new: true,
     }).exec();
-    // console.log(updated);
+    console.log("UPDATED COURSE => ", updated);
     res.json(updated);
   } catch (err) {
     console.log(err);
