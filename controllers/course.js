@@ -244,3 +244,38 @@ exports.deleteLesson = async (req, res) => {
     console.log(err);
   }
 };
+
+//update lesson
+exports.lessonUpdate = async (req, res) => {
+  try {
+    // console.log(req.body);
+    // console.log(req.params);
+    // console.log(req.user);
+
+    const { _id, title, content, video, free_preview } = req.body;
+    const { slug, lessonId } = req.params;
+
+    const course = await Course.findOne({ slug }).select("instructor").exec();
+
+    if (course.instructor._id.toString() !== req.user.userId) {
+      return res.status(400).send("Unauthorized");
+    }
+
+    const updated = await Course.updateOne(
+      { "lessons._id": lessonId },
+      {
+        $set: {
+          "lessons.$.title": title,
+          "lessons.$.content": content,
+          "lessons.$.video": video,
+          "lessons.$.free_preview": free_preview,
+        },
+      },
+      { new: true }
+    ).exec();
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Lesson update failed");
+  }
+};

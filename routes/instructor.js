@@ -25,6 +25,7 @@ const {
   addLesson,
   updateCourse,
   deleteLesson,
+  lessonUpdate,
 } = require("../controllers/course");
 
 //routes
@@ -64,6 +65,18 @@ router.post(
 
 router.put("/course/edit/:slug", requireSignIn, isInstructor, updateCourse);
 
-router.put("/course/delete/:slug/:lessonId", requireSignIn, isInstructor, deleteLesson);
+router.put(
+  "/course/delete/:slug/:lessonId",
+  requireSignIn,
+  isInstructor,
+  deleteLesson
+);
+
+router.put(
+  "/course/lesson-update/:slug/:lessonId",
+  requireSignIn,
+  isInstructor,
+  lessonUpdate
+);
 
 module.exports = router;
