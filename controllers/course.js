@@ -99,7 +99,7 @@ exports.create = async (req, res) => {
 
   const course = await new Course({
     slug: slugify(req.body.name),
-    instructor: req.user.userId,
+    instructor: { _id: req.user.userId, name: req.user.name },
     ...req.body,
   }).save();
   res.json(course);
@@ -194,7 +194,7 @@ exports.addLesson = async (req, res) => {
       { $push: { lessons: { title, video, content, slug: slugify(title) } } },
       { new: true }
     )
-      .populate("instructor", "id	name")
+      .populate("instructor", "_id	name")
       .exec();
     res.json(updated);
   } catch (err) {

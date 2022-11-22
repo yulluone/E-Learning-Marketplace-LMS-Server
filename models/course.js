@@ -61,9 +61,8 @@ const courseSchema = new Schema(
       default: true,
     },
     instructor: {
-      type: Schema.Types.ObjectId,
-      red: "User",
-      required: true,
+      _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      name: String,
     },
     lessons: [lessonSchema],
   },

@@ -1,10 +1,22 @@
 const User = require("../models/user");
+const Course = require("../models/course");
+
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const nodemailer = require("nodemailer");
 const { nanoid } = require("nanoid");
 const Wallet = require("../models/wallet");
 
+exports.getAllCourses = async (req, res) => {
+  try {
+    const all = await Course.find({ published: true })
+      // .populate("instructor")
+      .exec();
+    res.json(all);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 exports.register = async (req, res) => {
   User.register(
@@ -171,5 +183,3 @@ exports.forgotPassword = async (req, res) => {
 exports.passwordReset = async = (req, res) => {
   const code = req.body.code;
 };
-
-
