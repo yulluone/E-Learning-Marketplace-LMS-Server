@@ -26,6 +26,8 @@ const {
   updateCourse,
   deleteLesson,
   lessonUpdate,
+  unpublishCourse,
+  publishCourse,
 } = require("../controllers/course");
 
 //routes
@@ -78,5 +80,11 @@ router.put(
   isInstructor,
   lessonUpdate
 );
+
+//publish unpublish
+
+router.put("/course/publish-course/:courseId", requireSignIn, isInstructor, publishCourse)
+
+router.put("/course/unpublish-course/:courseId", requireSignIn, isInstructor, unpublishCourse)
 
 module.exports = router;
