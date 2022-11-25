@@ -46,8 +46,7 @@ exports.login = async (req, res) => {
       }
       if (!user) {
         console.log("Username or Password incorrect?");
-							res.json({ ok: false, message: "Username or Password incorrect" });
-							
+        res.json({ ok: false, message: "Username or Password incorrect" });
       } else {
         const payloadObj = {
           userId: user._id,
@@ -185,13 +184,92 @@ exports.getAllCourses = async (req, res) => {
   }
 };
 
-exports.getCourse = async (req, res) => { 
-		try {
-				const course = await Course.findOne({ slug: req.params.slug })
-						.populate("instructor", "_id name")
-						.exec();
-				res.json(course);
-		} catch (err) {
-				console.log(err);
-		}
-}
+exports.getCourse = async (req, res) => {
+  try {
+    const course = await Course.findOne({ slug: req.params.slug })
+      .populate("instructor", "_id name")
+      .exec();
+
+    if (!req.user) {
+      res.json({
+        enrolled: false,
+        course,
+      });
+    } else {
+      try {
+        console.log("userId", req.user.userId);
+        const user = await User.findById(req.user.userId).exec();
+        let ids = [];
+        let length = user && user.courses.length;
+        console.log("length", length);
+        for (let i = 0; i < length; i++) {
+          ids.push(user.courses[i].toString());
+        }
+        // console.log("course", course);
+
+        let status = ids.includes(course._id.toString());
+        console.log("status", status);
+
+        res.json({
+          enrolled: status,
+          course,
+        });
+      } catch (err) {
+        consol.log(err);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.checkEnrollment = async (req, res) => {
+  try {
+    console.log(req.body.courseId);
+    const courseId = req.params.courseId;
+    const user = await User.findById(req.user.userId).exec();
+    let ids = [];
+    let length = user && user.courses.length;
+    for (let i = 0; i < length; i++) {
+      ids.push(user.courses[i].toString());
+    }
+    const course = await Course.findById({ courseId }).exec();
+    console.log("course", course);
+
+    let status = ids.includes(course._id.toString());
+    console.log("status", status);
+
+    res.json({
+      enrolled: status,
+      course,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//enrollment
+
+exports.freeEnrollemnt = async (req, res) => {
+  try {
+    if (!req.user) return res.status(400).send("Unauthorized");
+    const slug = req.params.slug;
+
+    // check if course is free
+    const course = await Course.findOne({ slug }).exec();
+    if (course.paid) return;
+
+    const result = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $addToSet: { courses: course._id } },
+      { new: true }
+    ).exec();
+
+    return res.json({
+      message: "Congrats! You have succesfull enrolled on this course.",
+      course,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};

@@ -44,10 +44,10 @@ const userSchema = new Schema(
     stripe_account_id: "",
     stripe_sellers: {}, //w
     stripeSession: {},
+    courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 
     shortCode: {
       type: String,
-
     },
   },
 
