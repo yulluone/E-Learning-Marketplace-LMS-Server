@@ -7,17 +7,6 @@ const nodemailer = require("nodemailer");
 const { nanoid } = require("nanoid");
 const Wallet = require("../models/wallet");
 
-exports.getAllCourses = async (req, res) => {
-  try {
-    const all = await Course.find({ published: true })
-      // .populate("instructor")
-      .exec();
-    res.json(all);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 exports.register = async (req, res) => {
   User.register(
     { name: req.body.name, username: req.body.username, email: req.body.email },
@@ -56,8 +45,9 @@ exports.login = async (req, res) => {
         res.status(500).json({ ok: false, message: "Server error." });
       }
       if (!user) {
-        console.log("Username or Password incorrect");
-        res.json({ ok: false, message: "Username or Password incorrect" });
+        console.log("Username or Password incorrect?");
+							res.json({ ok: false, message: "Username or Password incorrect" });
+							
       } else {
         const payloadObj = {
           userId: user._id,
@@ -183,3 +173,25 @@ exports.forgotPassword = async (req, res) => {
 exports.passwordReset = async = (req, res) => {
   const code = req.body.code;
 };
+
+exports.getAllCourses = async (req, res) => {
+  try {
+    const all = await Course.find({ published: true })
+      // .populate("instructor")
+      .exec();
+    res.json(all);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.getCourse = async (req, res) => { 
+		try {
+				const course = await Course.findOne({ slug: req.params.slug })
+						.populate("instructor", "_id name")
+						.exec();
+				res.json(course);
+		} catch (err) {
+				console.log(err);
+		}
+}

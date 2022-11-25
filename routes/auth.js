@@ -20,4 +20,6 @@ authRouter.post("/password-reset", AuthController.passwordReset)
 
 authRouter.get("/courses", AuthController.getAllCourses)
 
+authRouter.get("/course/:slug", AuthController.getCourse)
+
 module.exports = authRouter;
