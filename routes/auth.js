@@ -32,4 +32,15 @@ authRouter.post(
   AuthController.freeEnrollemnt
 );
 
+authRouter.post(
+  "/paid-enrollment/:slug",
+  requireSignIn,
+  AuthController.paidEnrollemnt
+);
+
+authRouter.post(
+  "/mpesa/transaction/callback/:slug/:userId",
+  AuthController.mpesaCallback
+);
+
 module.exports = authRouter;

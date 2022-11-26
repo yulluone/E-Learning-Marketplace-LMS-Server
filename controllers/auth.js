@@ -6,6 +6,7 @@ const passport = require("passport");
 const nodemailer = require("nodemailer");
 const { nanoid } = require("nanoid");
 const Wallet = require("../models/wallet");
+const axios = require("axios");
 
 exports.register = async (req, res) => {
   User.register(
@@ -201,14 +202,14 @@ exports.getCourse = async (req, res) => {
         const user = await User.findById(req.user.userId).exec();
         let ids = [];
         let length = user && user.courses.length;
-        console.log("length", length);
+        // console.log("length", length);
         for (let i = 0; i < length; i++) {
           ids.push(user.courses[i].toString());
         }
         // console.log("course", course);
 
         let status = ids.includes(course._id.toString());
-        console.log("status", status);
+        // console.log("status", status);
 
         res.json({
           enrolled: status,
@@ -234,7 +235,7 @@ exports.checkEnrollment = async (req, res) => {
       ids.push(user.courses[i].toString());
     }
     const course = await Course.findById({ courseId }).exec();
-    console.log("course", course);
+    // console.log("course", course);
 
     let status = ids.includes(course._id.toString());
     console.log("status", status);
@@ -269,6 +270,67 @@ exports.freeEnrollemnt = async (req, res) => {
       message: "Congrats! You have succesfull enrolled on this course.",
       course,
     });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const unirest = require("unirest");
+const MpesaPushSTK = require("../utils/MpesaPushSTK");
+
+exports.paidEnrollemnt = async (req, res) => {
+  const courseSlug = req.params.slug;
+	const userId = req.user.userId;
+	const {mpesaNumber, price} = req.body;
+  const transaction = await MpesaPushSTK(
+    mpesaNumber,
+    price,
+    courseSlug,
+    userId
+  );
+  console.log("transaction", transaction.raw_body);
+
+  if (JSON.parse(transaction.raw_body).MerchantRequestID) {
+    res
+      .status(200)
+      .send(
+        "A push notification has been sent to your phone. Please	enter your pin to complete payment"
+      );
+  } else {
+    res.status(504).send("Payment attempt failed");
+  }
+};
+
+exports.mpesaCallback = async (req, res) => {
+  const { CallbackMetadata } = req.body.Body.stkCallback;
+  console.log(CallbackMetadata);
+
+  const { slug, userId } = req.params;
+  // console.log("mpesaCallback", CallbackMetadata);
+  if (!CallbackMetadata) {
+    res.send("ok");
+    console.log("user did not complete payment");
+    return;
+  }
+  try {
+    const amount = CallbackMetadata.Item[0].Value;
+    const transactionId = CallbackMetadata.Item[1].Value;
+    const transactionDate = CallbackMetadata.Item[3].Value;
+    const mpesaNumber = CallbackMetadata.Item[4].Value;
+
+    console.log(amount, transactionId, transactionDate, mpesaNumber);
+    return;
+    //find course paid for
+    const course = await Course.findOne({ slug }).exec();
+
+    //find user and add course id to courses array
+    await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { courses: course._id } },
+      { new: true }
+    ).exec();
+
+    res.send("ok");
   } catch (err) {
     console.log(err);
   }
