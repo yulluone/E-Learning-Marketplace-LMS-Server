@@ -62,7 +62,7 @@ const MpesaPushSTK = async (mpesaNumber, amount, courseSlug, userId) => {
             PartyB: 174379,
             PhoneNumber: `${mpesaNumber}`,
             CallBackURL: `https://45a7-102-68-79-35.ap.ngrok.io/auth/mpesa/transaction/callback/${courseSlug}/${userId}`,
-            AccountReference: "Edemy",
+            AccountReference: "YulluCorp",
             TransactionDesc: "Enrollment",
           })
         );

@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 const transactionSchema = new Schema(
   {
+    name: {
+      type: String,
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -11,23 +14,17 @@ const transactionSchema = new Schema(
       type: Number,
       trim: true,
     },
-    name: {
-      type: String,
-      required: [true, "name is required"],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, "email is required"],
-      trim: true,
-    },
-    phone: {
+
+    mpesaNumber: {
       type: String,
     },
     amount: {
       type: Number,
       required: [true, "amount is required"],
-    },	
+    },
+    transactionDate: {
+      type: String,
+    },
   },
   {
     timestamps: true,

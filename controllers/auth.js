@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const Course = require("../models/course");
-
+const Transaction = require("../models/transaction");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const nodemailer = require("nodemailer");
@@ -280,8 +280,8 @@ const MpesaPushSTK = require("../utils/MpesaPushSTK");
 
 exports.paidEnrollemnt = async (req, res) => {
   const courseSlug = req.params.slug;
-	const userId = req.user.userId;
-	const {mpesaNumber, price} = req.body;
+  const userId = req.user.userId;
+  const { mpesaNumber, price } = req.body;
   const transaction = await MpesaPushSTK(
     mpesaNumber,
     price,
@@ -318,11 +318,18 @@ exports.mpesaCallback = async (req, res) => {
     const transactionDate = CallbackMetadata.Item[3].Value;
     const mpesaNumber = CallbackMetadata.Item[4].Value;
 
-    console.log(amount, transactionId, transactionDate, mpesaNumber);
-    return;
+    // console.log(amount, transactionId, transactionDate, mpesaNumber);
     //find course paid for
-    const course = await Course.findOne({ slug }).exec();
 
+    const course = await Course.findOne({ slug }).exec();
+    //add transaction to transaction model
+    const transaction = await Transaction.create({
+      amount,
+      transactionId,
+      transactionDate,
+      mpesaNumber,
+      userId,
+    });
     //find user and add course id to courses array
     await User.findByIdAndUpdate(
       userId,
