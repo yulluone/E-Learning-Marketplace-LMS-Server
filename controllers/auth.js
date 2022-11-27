@@ -323,21 +323,39 @@ exports.mpesaCallback = async (req, res) => {
 
     const course = await Course.findOne({ slug }).exec();
     //add transaction to transaction model
-    const transaction = await Transaction.create({
+    const transaction = await new Transaction({
       amount,
       transactionId,
       transactionDate,
       mpesaNumber,
       userId,
     });
+    console.log("transaction recorded", transaction);
     //find user and add course id to courses array
     await User.findByIdAndUpdate(
       userId,
       { $addToSet: { courses: course._id } },
       { new: true }
     ).exec();
+    console.log("user courses updated");
 
     res.send("ok");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//get all user courses
+exports.userCourses = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+
+    const courses = await Course.find({ _id: { $in: user.courses } })
+      .populate("instructor", "id name")
+      .exec();
+
+    res.json(courses);
   } catch (err) {
     console.log(err);
   }

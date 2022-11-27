@@ -11,8 +11,7 @@ const transactionSchema = new Schema(
       ref: "User",
     },
     transactionId: {
-      type: Number,
-      trim: true,
+      type: String,
     },
 
     mpesaNumber: {
