@@ -43,6 +43,5 @@ authRouter.post(
   AuthController.mpesaCallback
 );
 
-authRouter.get("/user-courses", requireSignIn, AuthController.userCourses);
 
 module.exports = authRouter;

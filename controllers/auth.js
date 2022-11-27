@@ -191,34 +191,36 @@ exports.getCourse = async (req, res) => {
       .populate("instructor", "_id name")
       .exec();
 
-    if (!req.user) {
-      res.json({
-        enrolled: false,
-        course,
-      });
-    } else {
-      try {
-        console.log("userId", req.user.userId);
-        const user = await User.findById(req.user.userId).exec();
-        let ids = [];
-        let length = user && user.courses.length;
-        // console.log("length", length);
-        for (let i = 0; i < length; i++) {
-          ids.push(user.courses[i].toString());
-        }
-        // console.log("course", course);
+    if (req.user && req.user.userId) {
+      const user = await User.findById(req.user.userId).exec();
+      let ids = [];
+      let length = user && user.courses.length;
+      // console.log("length", length);
+      for (let i = 0; i < length; i++) {
+        ids.push(user.courses[i].toString());
+      }
+      // console.log("course", course);
 
-        let status = ids.includes(course._id.toString());
-        // console.log("status", status);
+      let enrollmentStatus = ids.includes(course._id.toString());
+      // console.log("status", status);
 
-        res.json({
-          enrolled: status,
+      if (enrollmentStatus) {
+        return res.json({
+          enrolled: enrollmentStatus,
           course,
         });
-      } catch (err) {
-        consol.log(err);
       }
     }
+
+    for (let i = 0; i < course.lessons.length; i++) {
+      if (!course.lessons[i].free_preview) {
+        course.lessons[i].video = {};
+      }
+    }
+    return res.json({
+      enrolled: false,
+      course,
+    });
   } catch (err) {
     console.log(err);
   }
@@ -226,7 +228,7 @@ exports.getCourse = async (req, res) => {
 
 exports.checkEnrollment = async (req, res) => {
   try {
-    console.log(req.body.courseId);
+    // console.log(req.body.courseId);
     const courseId = req.params.courseId;
     const user = await User.findById(req.user.userId).exec();
     let ids = [];
@@ -345,18 +347,3 @@ exports.mpesaCallback = async (req, res) => {
   }
 };
 
-//get all user courses
-exports.userCourses = async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const user = await User.findById(userId);
-
-    const courses = await Course.find({ _id: { $in: user.courses } })
-      .populate("instructor", "id name")
-      .exec();
-
-    res.json(courses);
-  } catch (err) {
-    console.log(err);
-  }
-};
