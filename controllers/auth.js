@@ -315,16 +315,33 @@ exports.mpesaCallback = async (req, res) => {
     return;
   }
   try {
-    const amount = CallbackMetadata.Item[0].Value;
-    const transactionId = CallbackMetadata.Item[1].Value;
-    const transactionDate = CallbackMetadata.Item[3].Value;
-    const mpesaNumber = CallbackMetadata.Item[4].Value;
+    const amount = CallbackMetadata.Item.find(
+      (item) => item.Name === "Amount"
+    ).Value;
+    const transactionId = CallbackMetadata.Item.find(
+      (item) => item.Name === "MpesaReceiptNumber"
+    ).Value;
+    const transactionDate = CallbackMetadata.Item.find(
+      (item) => item.Name === "TransactionDate"
+    ).Value;
+    const mpesaNumber = CallbackMetadata.Item.find(
+      (item) => item.Name === "PhoneNumber"
+    ).Value;
 
     // console.log(amount, transactionId, transactionDate, mpesaNumber);
     //find course paid for
 
     const course = await Course.findOne({ slug }).exec();
-    //add transaction to transaction model
+
+    //find user and add course id to courses array
+    await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { courses: course._id } },
+      { new: true }
+    ).exec();
+			console.log("user courses updated");
+			
+    //add transaction to db
     const transaction = await new Transaction({
       amount,
       transactionId,
@@ -333,17 +350,9 @@ exports.mpesaCallback = async (req, res) => {
       userId,
     });
     console.log("transaction recorded", transaction);
-    //find user and add course id to courses array
-    await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { courses: course._id } },
-      { new: true }
-    ).exec();
-    console.log("user courses updated");
 
     res.send("ok");
   } catch (err) {
     console.log(err);
   }
 };
-
