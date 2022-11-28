@@ -45,4 +45,10 @@ authRouter.post(
 
 authRouter.post("/mark-completed", requireSignIn, AuthController.markCompleted);
 
+authRouter.post(
+  "/completed-lessons",
+  requireSignIn,
+  AuthController.completedLessons
+);
+
 module.exports = authRouter;

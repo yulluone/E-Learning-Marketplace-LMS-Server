@@ -363,10 +363,9 @@ exports.mpesaCallback = async (req, res) => {
 exports.markCompleted = async (req, res) => {
   if (!req.user) return res.status(400).send("Unauthorized");
   try {
-    const { lessonId, courseId } = req.body;
+    const { lessonId, courseId, lessonComplete } = req.body;
     const { userId } = req.user.userId;
-
-    //check if document exista
+    //check if document exists
     const exixts = await Completed.findOne({
       user: userId,
       course: courseId,
@@ -390,6 +389,23 @@ exports.markCompleted = async (req, res) => {
 
       res.json({ ok: true });
     }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.completedLessons = async (req, res) => {
+  if (!req.user) return res.status(400).send("Unauthorized");
+
+  try {
+    const { courseId } = req.body;
+    const { userId } = req.user.userId;
+    const list = await Completed.findOne({
+      user: userId,
+      course: courseId,
+    }).exec();
+
+    list && res.json(list.lessons);
   } catch (err) {
     console.log(err);
   }
