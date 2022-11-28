@@ -339,8 +339,8 @@ exports.mpesaCallback = async (req, res) => {
       { $addToSet: { courses: course._id } },
       { new: true }
     ).exec();
-			console.log("user courses updated");
-			
+    console.log("user courses updated");
+
     //add transaction to db
     const transaction = await new Transaction({
       amount,
@@ -348,7 +348,7 @@ exports.mpesaCallback = async (req, res) => {
       transactionDate,
       mpesaNumber,
       userId,
-    });
+    }).save();
     console.log("transaction recorded", transaction);
 
     res.send("ok");
