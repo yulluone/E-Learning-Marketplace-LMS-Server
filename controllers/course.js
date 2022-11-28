@@ -5,6 +5,7 @@ const slugify = require("slugify");
 const fs = require("fs");
 const path = require("path");
 const { Storage } = require("@google-cloud/storage");
+const User = require("../models/user");
 
 const gc = new Storage({
   keyFilename: path.join(__dirname, "../optimal-weft-368215-e62d705e67e7.json"),
@@ -323,5 +324,24 @@ exports.publishCourse = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(400).send("Attempt to publish course failed");
+  }
+};
+
+exports.studentCount = async (req, res) => {
+  if (!req.user || req.user.userId !== req.body.instructorId) {
+    return res.status(400).send("Unauthorized");
+    console.log("Unauthorized");
+  }
+
+  try {
+    const { courseId } = req.body;
+
+    const students = await User.find({ courses: courseId })
+      .select("_id")
+      .exec();
+
+    res.json(students);
+  } catch (err) {
+    console.log(err);
   }
 };

@@ -28,7 +28,11 @@ const {
   lessonUpdate,
   unpublishCourse,
   publishCourse,
+  studentCount,
 } = require("../controllers/course");
+
+//students count
+router.post("/student-count", requireSignIn, studentCount);
 
 //routes
 router.post("/make-instructor", requireSignIn, makeInstructor);
@@ -53,7 +57,7 @@ router.post(
   formidable(),
   videoUpload
 );
- 
+
 //remove video
 router.post("/course/video-remove/:instructorId", requireSignIn, removeVideo);
 
@@ -83,8 +87,18 @@ router.put(
 
 //publish unpublish
 
-router.put("/course/publish-course/:courseId", requireSignIn, isInstructor, publishCourse)
+router.put(
+  "/course/publish-course/:courseId",
+  requireSignIn,
+  isInstructor,
+  publishCourse
+);
 
-router.put("/course/unpublish-course/:courseId", requireSignIn, isInstructor, unpublishCourse)
+router.put(
+  "/course/unpublish-course/:courseId",
+  requireSignIn,
+  isInstructor,
+  unpublishCourse
+);
 
 module.exports = router;
