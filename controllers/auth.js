@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const { nanoid } = require("nanoid");
 const Wallet = require("../models/wallet");
 const axios = require("axios");
+const Completed = require("../models/completed");
 
 exports.register = async (req, res) => {
   User.register(
@@ -279,6 +280,7 @@ exports.freeEnrollemnt = async (req, res) => {
 
 const unirest = require("unirest");
 const MpesaPushSTK = require("../utils/MpesaPushSTK");
+const { default: completed } = require("../models/completed");
 
 exports.paidEnrollemnt = async (req, res) => {
   const courseSlug = req.params.slug;
@@ -352,6 +354,42 @@ exports.mpesaCallback = async (req, res) => {
     console.log("transaction recorded", transaction);
 
     res.send("ok");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+//lesson completion
+exports.markCompleted = async (req, res) => {
+  if (!req.user) return res.status(400).send("Unauthorized");
+  try {
+    const { lessonId, courseId } = req.body;
+    const { userId } = req.user.userId;
+
+    //check if document exista
+    const exixts = await Completed.findOne({
+      user: userId,
+      course: courseId,
+    }).exec();
+    if (exixts) {
+      //update
+      const updated = await Completed.findOneAndUpdate(
+        { user: userId, course: courseId },
+        { $addToSet: { lessons: lessonId } },
+        { new: true }
+      ).exec();
+
+      res.json({ ok: true });
+    } else {
+      //create new
+      const completed = await new Completed({
+        user: userId,
+        course: courseId,
+        lessons: [lessonId],
+      }).save();
+
+      res.json({ ok: true });
+    }
   } catch (err) {
     console.log(err);
   }

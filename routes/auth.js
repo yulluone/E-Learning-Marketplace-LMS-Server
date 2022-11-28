@@ -43,5 +43,6 @@ authRouter.post(
   AuthController.mpesaCallback
 );
 
+authRouter.post("/mark-completed", requireSignIn, AuthController.markCompleted);
 
 module.exports = authRouter;
