@@ -333,7 +333,9 @@ exports.mpesaCallback = async (req, res) => {
     // console.log(amount, transactionId, transactionDate, mpesaNumber);
     //find course paid for
 
-    const course = await Course.findOne({ slug }).exec();
+    const course = await Course.findOne({ slug })
+      .populate("instructor", "_id name")
+      .exec();
 
     //find user and add course id to courses array
     await User.findByIdAndUpdate(
@@ -350,6 +352,7 @@ exports.mpesaCallback = async (req, res) => {
       transactionDate,
       mpesaNumber,
       userId,
+      instructorId: course.instructor._id,
     }).save();
     console.log("transaction recorded", transaction);
 

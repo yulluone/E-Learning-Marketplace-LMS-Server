@@ -24,6 +24,10 @@ const transactionSchema = new Schema(
     transactionDate: {
       type: String,
     },
+    instructorId: {
+      type: Schema.Types.ObjectId,
+      ref: "Instructor",
+    },
   },
   {
     timestamps: true,
