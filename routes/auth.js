@@ -51,4 +51,10 @@ authRouter.post(
   AuthController.completedLessons
 );
 
+authRouter.post(
+  "/mark-incomplete",
+  requireSignIn,
+  AuthController.markIncomplete
+);
+
 module.exports = authRouter;

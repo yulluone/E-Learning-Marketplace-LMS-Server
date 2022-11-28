@@ -378,7 +378,7 @@ exports.markCompleted = async (req, res) => {
         { new: true }
       ).exec();
 
-      res.json({ ok: true });
+      updated && res.json(updated.lessons);
     } else {
       //create new
       const completed = await new Completed({
@@ -387,7 +387,7 @@ exports.markCompleted = async (req, res) => {
         lessons: [lessonId],
       }).save();
 
-      res.json({ ok: true });
+      completed && res.json(completed.lessons);
     }
   } catch (err) {
     console.log(err);
@@ -406,6 +406,26 @@ exports.completedLessons = async (req, res) => {
     }).exec();
 
     list && res.json(list.lessons);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.markIncomplete = async (req, res) => {
+  if (!req.user) return res.status(400).send("Unauthorized");
+
+  try {
+    const { lessonId, courseId } = req.body;
+    const { userId } = req.user.userId;
+
+    const updated = await Completed.findOneAndUpdate(
+      { user: userId, course: courseId },
+      {
+        $pull: { lessons: lessonId },
+      },
+      { new: true }
+    ).exec();
+    updated && res.json(updated.lessons);
   } catch (err) {
     console.log(err);
   }
