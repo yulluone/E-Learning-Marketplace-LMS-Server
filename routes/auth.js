@@ -1,5 +1,5 @@
 const express = require("express");
-const { requireSignIn } = require("../middlewares");
+const { requireSignIn, isInstructor } = require("../middlewares");
 const authRouter = express.Router();
 // controllers
 const AuthController = require("../controllers/auth");
@@ -55,6 +55,12 @@ authRouter.post(
   "/mark-incomplete",
   requireSignIn,
   AuthController.markIncomplete
+);
+
+authRouter.post(
+  "/instructor/balance",
+  requireSignIn,
+  AuthController.balance
 );
 
 module.exports = authRouter;

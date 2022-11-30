@@ -62,7 +62,7 @@ const MpesaPushSTK = async (mpesaNumber, amount, courseSlug, userId) => {
             PartyB: 174379,
             PhoneNumber: `${mpesaNumber}`,
 
-            CallBackURL: `https://9009-102-68-79-35.ap.ngrok.io/auth/mpesa/transaction/callback/${courseSlug}/${userId}`,
+            CallBackURL: `${process.env.SAF_CALLBACK_URL}/auth/mpesa/transaction/callback/${courseSlug}/${userId}`,
             AccountReference: "YulluCorp",
             TransactionDesc: "Enrollment",
           })

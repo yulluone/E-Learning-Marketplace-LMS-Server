@@ -330,12 +330,21 @@ exports.mpesaCallback = async (req, res) => {
       (item) => item.Name === "PhoneNumber"
     ).Value;
 
-    // console.log(amount, transactionId, transactionDate, mpesaNumber);
+    console.log(amount, transactionId, transactionDate, mpesaNumber);
     //find course paid for
 
     const course = await Course.findOne({ slug })
       .populate("instructor", "_id name")
       .exec();
+
+    //add 70% to instructor wallet
+    const updateBalance = await Wallet.findOneAndUpdate(
+      { _id: course.instructor._id },
+      {
+        $inc: { balance: parseInt(amount) * 0.7 },
+      }
+    );
+    console.log("updateBalance", updateBalance);
 
     //find user and add course id to courses array
     await User.findByIdAndUpdate(
@@ -429,6 +438,19 @@ exports.markIncomplete = async (req, res) => {
       { new: true }
     ).exec();
     updated && res.json(updated.lessons);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.balance = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    if (!userId) return res.status(400).send("Unauthorized");
+
+    const wallet = await Wallet.findOne({ _id: userId }).exec();
+    // console.log(wallet);
+    res.json(wallet.balance);
   } catch (err) {
     console.log(err);
   }
