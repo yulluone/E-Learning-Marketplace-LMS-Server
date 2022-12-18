@@ -63,4 +63,11 @@ authRouter.post(
   AuthController.balance
 );
 
+authRouter.post(
+  "/user-courses",
+  requireSignIn,
+  AuthController.userCourses
+);
+
+
 module.exports = authRouter;

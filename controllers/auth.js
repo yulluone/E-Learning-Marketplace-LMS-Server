@@ -455,3 +455,21 @@ exports.balance = async (req, res) => {
     console.log(err);
   }
 };
+
+//user courses
+exports.userCourses = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const user = await User.findOne({ _id: userId }).select("courses").exec();
+    //we find the id based what is in user.courses //note: enrolledcourses for paid and free=$in: user.courses
+    const courses = await Course.find({ _id: { $in: user.courses } })
+      .populate("instructor", "_id name")
+      .exec();
+
+    // console.log(courses);
+    res.json(courses);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Error fetching courses");
+  }
+};
